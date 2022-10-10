@@ -4,7 +4,7 @@ datasources:
   - name: msp_session_1
     uid: msp-challenge-msp-session-1
     type: mysql
-    url: localhost:45002
+    url: localhost:3306
     database: msp_session_1
     user: root
     jsonData:
