@@ -160,3 +160,4 @@ set sql_log_bin = 1;
 create user my2@'%' identified by 'kZ7$X181R&u7';
 grant all on my2.* to my2@'%';
 grant select on performance_schema.* to my2@'%';
+GRANT SELECT ON *.* TO 'my2'@'%';
