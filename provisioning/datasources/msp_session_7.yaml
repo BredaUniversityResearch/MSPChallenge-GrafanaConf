@@ -12,4 +12,4 @@ datasources:
       maxIdleConns: 2 # Grafana v5.4+
       connMaxLifetime: 14400 # Grafana v5.4+
     secureJsonData:
-      password:
+      password: $DATABASE_PASSWORD
