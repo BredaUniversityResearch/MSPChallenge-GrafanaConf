@@ -6,10 +6,10 @@ datasources:
     type: mysql
     url: localhost:3306
     database: msp_session_2
-    user: root
+    user: my2
     jsonData:
       maxOpenConns: 0 # Grafana v5.4+
       maxIdleConns: 2 # Grafana v5.4+
       connMaxLifetime: 14400 # Grafana v5.4+
     secureJsonData:
-      password: $DATABASE_PASSWORD
+      password: $MY2_PASSWORD
