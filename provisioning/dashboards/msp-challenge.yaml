@@ -1,0 +1,10 @@
+# # config file version
+apiVersion: 1
+
+providers:
+- name: 'msp-challenge'
+  folder: 'MSP Challenge'
+  orgId: 1
+  type: file
+  options:
+    path: C:/Program Files/MSP Challenge/grafana-msp-challenge-conf/msp-challenge/dashboards
