@@ -614,7 +614,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  count(g.geometry_id)\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  count(g.geometry_id)\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -702,7 +702,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  sum(eo.energy_output_maxcapacity)/1000000000\r\nfrom energy_output eo\r\ninner join geometry g on g.geometry_id=eo.energy_output_geometry_id\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  sum(eo.energy_output_maxcapacity)/1000000000\r\nfrom energy_output eo\r\ninner join geometry g on g.geometry_id=eo.energy_output_geometry_id\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -1405,7 +1405,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT (SUM(i.max_gw)-IFNULL(SUM(i.cables_gw),0))/1000000000 as missing_gw\r\nfrom\r\n(SELECT\r\n  eo.energy_output_maxcapacity as max_gw,SUM(eo2.energy_output_maxcapacity) as cables_gw\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\ninner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\nleft join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\nleft join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\nleft join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\nwhere c.country_name IN ($Team)\r\ngroup by g.geometry_id) as i",
+          "rawSql": "SELECT (SUM(i.max_gw)-IFNULL(SUM(i.cables_gw),0))/1000000000 as missing_gw\r\nfrom\r\n(SELECT\r\n  eo.energy_output_maxcapacity as max_gw,SUM(eo2.energy_output_maxcapacity) as cables_gw\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\ninner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\nleft join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\nleft join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\nleft join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\nwhere c.country_name IN ($Team)\r\ngroup by g.geometry_id) as i",
           "refId": "A",
           "select": [
             [
@@ -1718,7 +1718,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  count(w.warning_id)\r\n from warning w\r\ninner join layer l on w.warning_layer_id=l.layer_id\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere w.warning_active=1 and warning_issue_type='Error' and c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  count(w.warning_id)\r\n from warning w\r\ninner join layer l on w.warning_layer_id=l.layer_id\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere w.warning_active=1 and warning_issue_type='Error' and c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -1977,7 +1977,7 @@
     "list": [
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "msp_session_1",
           "value": "msp_session_1"
         },
@@ -1995,7 +1995,7 @@
       },
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": [
             "Green",
             "Red",
@@ -2003,7 +2003,8 @@
             "Yellow",
             "Orange",
             "Blue",
-            "Purple"
+            "Purple",
+            "Brown"
           ],
           "value": [
             "Green",
@@ -2012,7 +2013,8 @@
             "Yellow",
             "Orange",
             "Blue",
-            "Purple"
+            "Purple",
+            "Brown"
           ]
         },
         "datasource": {
@@ -2043,6 +2045,6 @@
   "timezone": "",
   "title": "MSP Challenge session monitoring dashboard",
   "uid": "k5fkOrVVz",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }
