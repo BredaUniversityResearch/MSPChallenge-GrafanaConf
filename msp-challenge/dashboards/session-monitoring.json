@@ -318,7 +318,7 @@
           "hide": false,
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  now() as time_sec,\r\n  plan_state as metric,\r\n  COUNT(plan_id) as value\r\nFROM plan p\r\ninner join country c on c.country_id = p.plan_country_id\r\nwhere c.country_name IN ($Team)\r\nGROUP by plan_state",
+          "rawSql": "SELECT\r\n  now() as time_sec,\r\n  plan_state as metric,\r\n  COUNT(plan_id) as value\r\nFROM plan p\r\ninner join country c on c.country_id = p.plan_country_id\r\nwhere c.country_name IN ($Team) and p.plan_state != 'DELETED'\r\nGROUP by plan_state",
           "refId": "A",
           "select": [
             [
@@ -526,7 +526,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "select\r\nc.country_name as Country,\r\nCONCAT(p.plan_name, ' farm #',g.geometry_id) as Farm,\r\neo.energy_output_maxcapacity/1000000000 as 'Max capacity GW',\r\nIFNULL(SUM(eo2.energy_output_maxcapacity),0)/1000000000 as 'Cables GW',\r\nSUM(IF(JSON_CONTAINS_PATH(g2.geometry_data, 'one', '$.NumberCables'),JSON_EXTRACT(g2.geometry_data, '$.NumberCables')+0,0)) as 'Number of cables',\r\nCONCAT(GROUP_CONCAT((eo2.energy_output_maxcapacity/1000000000) SEPARATOR ' + ')) as 'Cable GW distribution'\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\ninner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\nleft join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\nleft join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\nleft join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\nwhere c.country_name IN ($Team)\r\ngroup by g.geometry_id\r\norder by FIELD(p.plan_state,'DESIGN','CONSULTATION','APPROVAL','APPROVED','IMPLEMENTED'), p.plan_id DESC",
+          "rawSql": "select\r\nc.country_name as Country,\r\nCONCAT(p.plan_name, ' farm #',g.geometry_id) as Farm,\r\neo.energy_output_maxcapacity/1000000000 as 'Max capacity GW',\r\nIFNULL(SUM(eo2.energy_output_maxcapacity),0)/1000000000 as 'Cables GW',\r\nSUM(IF(JSON_CONTAINS_PATH(g2.geometry_data, 'one', '$.NumberCables'),JSON_EXTRACT(g2.geometry_data, '$.NumberCables')+0,0)) as 'Number of cables',\r\nCONCAT(GROUP_CONCAT((eo2.energy_output_maxcapacity/1000000000) SEPARATOR ' + ')) as 'Cable GW distribution'\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\ninner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\nleft join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\nleft join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\nleft join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\nwhere c.country_name IN ($Team)\r\ngroup by g.geometry_id\r\norder by FIELD(p.plan_state,'DESIGN','CONSULTATION','APPROVAL','APPROVED','IMPLEMENTED'), p.plan_id DESC",
           "refId": "A",
           "select": [
             [
@@ -614,7 +614,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  count(g.geometry_id)\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  count(g.geometry_id)\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -702,7 +702,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  sum(eo.energy_output_maxcapacity)/1000000000\r\nfrom energy_output eo\r\ninner join geometry g on g.geometry_id=eo.energy_output_geometry_id\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  IFNULL(sum(eo.energy_output_maxcapacity),0)/1000000000\r\nfrom energy_output eo\r\ninner join geometry g on g.geometry_id=eo.energy_output_geometry_id\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -1082,7 +1082,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  IFNULL(SUM(eo2.energy_output_maxcapacity),0)/1000000000\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\ninner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\nleft join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\nleft join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\nleft join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\nwhere c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  IFNULL(SUM(eo2.energy_output_maxcapacity),0)/1000000000\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\ninner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\nleft join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\nleft join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\nleft join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\nwhere c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -1317,7 +1317,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "select\r\n  CONCAT(c.country_name, ':', IF(plan_name='',CONCAT('plan ', plan_id),plan_name)) as name,\r\n  plan_state as state,\r\n  TIMEDIFF(now(), plan_time) as lifetime\r\nfrom plan p\r\ninner join country c on c.country_id = p.plan_country_id\r\nwhere plan_state IN ('DESIGN','CONSULTATION','APPROVAL') and TIMESTAMPDIFF(DAY, plan_time, now()) = 0 and c.country_name IN ($Team)\r\nORDER BY plan_time",
+          "rawSql": "select\r\n  CONCAT(c.country_name, ':', IF(plan_name='',CONCAT('plan ', plan_id),plan_name)) as name,\r\n  plan_state as state,\r\n  TIMEDIFF(now(), plan_time) as lifetime\r\nfrom plan p\r\ninner join country c on c.country_id = p.plan_country_id\r\nwhere plan_state IN ('DESIGN','CONSULTATION','APPROVAL') and TIMESTAMPDIFF(DAY, plan_time, now()) = 0 and c.country_name IN ($Team) and p.plan_state != 'DELETED'\r\nORDER BY plan_time",
           "refId": "A",
           "select": [
             [
@@ -1405,7 +1405,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT (SUM(i.max_gw)-IFNULL(SUM(i.cables_gw),0))/1000000000 as missing_gw\r\nfrom\r\n(SELECT\r\n  eo.energy_output_maxcapacity as max_gw,SUM(eo2.energy_output_maxcapacity) as cables_gw\r\nfrom geometry g\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\ninner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\nleft join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\nleft join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\nleft join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\nwhere c.country_name IN ($Team)\r\ngroup by g.geometry_id) as i",
+          "rawSql": "SELECT IFNULL(SUM(i.max_gw)-SUM(least(i.max_gw,i.cables_gw)),0)/1000000000 as missing_gw\r\nfrom\r\n(\r\n  SELECT\r\n    eo.energy_output_maxcapacity as max_gw,IFNULL(SUM(eo2.energy_output_maxcapacity),0) as cables_gw\r\n  from geometry g\r\n  inner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\n  inner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\n  inner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\n  inner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\n  inner join country c on c.country_id=p.plan_country_id\r\n  inner join energy_output eo on g.geometry_id=eo.energy_output_geometry_id\r\n  left join energy_connection ec on ec.energy_connection_start_id=g.geometry_id OR ec.energy_connection_end_id=g.geometry_id\r\n  left join geometry g2 on g2.geometry_id=ec.energy_connection_cable_id\r\n  left join energy_output eo2 on eo2.energy_output_geometry_id=g2.geometry_id\r\n  where c.country_name IN ($Team)\r\n  group by g.geometry_id\r\n) as i",
           "refId": "A",
           "select": [
             [
@@ -1494,7 +1494,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  sum(eo.energy_output_capacity)/1000000000\r\nfrom energy_output eo\r\ninner join geometry g on g.geometry_id=eo.energy_output_geometry_id\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  IFNULL(sum(eo.energy_output_capacity),0)/1000000000\r\nfrom energy_output eo\r\ninner join geometry g on g.geometry_id=eo.energy_output_geometry_id\r\ninner join layer l on l.layer_id=g.geometry_layer_id and l.layer_original_id is NOT NULL\r\ninner join layer ol on l.layer_original_id=ol.layer_id AND ol.layer_editing_type='sourcepolygon'\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -1718,7 +1718,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "SELECT\r\n  count(w.warning_id)\r\n from warning w\r\ninner join layer l on w.warning_layer_id=l.layer_id\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere w.warning_active=1 and warning_issue_type='Error' and c.country_name IN ($Team)",
+          "rawSql": "SELECT\r\n  count(w.warning_id)\r\n from warning w\r\ninner join layer l on w.warning_layer_id=l.layer_id\r\ninner join plan_layer pl on pl.plan_layer_layer_id=l.layer_id\r\ninner join plan p on p.plan_id=pl.plan_layer_plan_id and p.plan_state != 'DELETED'\r\ninner join country c on c.country_id=p.plan_country_id\r\nwhere w.warning_active=1 and warning_issue_type='Error' and c.country_name IN ($Team)",
           "refId": "A",
           "select": [
             [
@@ -1941,7 +1941,7 @@
           "group": [],
           "metricColumn": "none",
           "rawQuery": true,
-          "rawSql": "select\r\n  CONCAT(c.country_name, ':', IF(plan_name='',CONCAT('plan id: ', plan_id),plan_name)) as name,\r\n  plan_state as state,\r\n  TIMEDIFF(now(), plan_time) as lifetime\r\nfrom plan p\r\ninner join country c on c.country_id = p.plan_country_id\r\nwhere plan_state IN ('DESIGN','CONSULTATION','APPROVAL') and TIMESTAMPDIFF(DAY, plan_time, now()) > 0 and c.country_name IN ($Team)\r\nORDER BY plan_time",
+          "rawSql": "select\r\n  CONCAT(c.country_name, ':', IF(plan_name='',CONCAT('plan id: ', plan_id),plan_name)) as name,\r\n  plan_state as state,\r\n  TIMEDIFF(now(), plan_time) as lifetime\r\nfrom plan p\r\ninner join country c on c.country_id = p.plan_country_id\r\nwhere plan_state IN ('DESIGN','CONSULTATION','APPROVAL') and TIMESTAMPDIFF(DAY, plan_time, now()) > 0 and c.country_name IN ($Team) and p.plan_state != 'DELETED'\r\nORDER BY plan_time",
           "refId": "A",
           "select": [
             [
@@ -1978,8 +1978,8 @@
       {
         "current": {
           "selected": false,
-          "text": "msp_session_1",
-          "value": "msp_session_1"
+          "text": "msp_session_2",
+          "value": "msp_session_2"
         },
         "hide": 1,
         "includeAll": false,
@@ -1995,26 +1995,28 @@
       },
       {
         "current": {
-          "selected": true,
+          "selected": false,
           "text": [
-            "Green",
+            "Orange",
             "Red",
+            "Green",
+            "Blue",
+            "Purple",
             "Pink",
             "Yellow",
-            "Orange",
-            "Brown",
-            "Blue",
-            "Purple"
+            "Lime",
+            "Aqua"
           ],
           "value": [
-            "Green",
+            "Orange",
             "Red",
+            "Green",
+            "Blue",
+            "Purple",
             "Pink",
             "Yellow",
-            "Orange",
-            "Brown",
-            "Blue",
-            "Purple"
+            "Lime",
+            "Aqua"
           ]
         },
         "datasource": {
@@ -2045,6 +2047,6 @@
   "timezone": "",
   "title": "MSP Challenge session monitoring dashboard",
   "uid": "k5fkOrVVz",
-  "version": 12,
+  "version": 15,
   "weekStart": ""
 }
